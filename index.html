@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Memorization Tracker | Riven ⚡</title>
+    <meta name="description" content="Track your Quran memorization progress with this simple, local-first tool">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a14;
+            color: #fff;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #7b2ff7, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+        
+        .stats {
+            background: #1a1a2e;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .total-progress {
+            text-align: center;
+        }
+        
+        .total-progress span {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background: #2a2a3e;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7b2ff7, #00d4ff);
+            transition: width 0.3s ease;
+        }
+        
+        .add-surah-section {
+            background: #1a1a2e;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .add-surah-section h2 {
+            margin-top: 0;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 10px;
+        }
+        
+        .form-row input {
+            padding: 12px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #111;
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        .form-row input:focus {
+            outline: none;
+            border-color: #7b2ff7;
+        }
+        
+        .form-row button {
+            padding: 12px 20px;
+            background: #7b2ff7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .form-row button:hover {
+            background: #6a1ed6;
+        }
+        
+        .surahs-list h2 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        
+        .surah-card {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .surah-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .surah-names h3 {
+            font-size: 1.4rem;
+            margin: 0 0 5px 0;
+            direction: rtl;
+            text-align: right;
+            color: #fff;
+        }
+        
+        .surah-names p {
+            color: #888;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        .surah-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .surah-actions button {
+            padding: 6px 12px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: #2a2a3e;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .surah-actions button:hover {
+            border-color: #7b2ff7;
+            color: #fff;
+        }
+        
+        .delete-btn {
+            background: #2a2a3e;
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+        
+        .delete-btn:hover {
+            background: #ff6b6b;
+            color: #000;
+            border-color: #ff6b6b;
+        }
+        
+        .progress-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .verse-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .verse-input label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .verse-input input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #333;
+            border-radius: 6px;
+            background: #111;
+            color: #fff;
+        }
+        
+        .verse-input input:focus {
+            outline: none;
+            border-color: #7b2ff7;
+        }
+        
+        .verse-input span {
+            color: #888;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            border: 2px dashed #333;
+            border-radius: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .surah-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .surah-actions {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📖 Quran Memorization Tracker</h1>
+            <p>Track your progress in memorizing the Holy Quran. All data stays on your device.</p>
+        </header>
+        
+        <div class="stats">
+            <div class="total-progress">
+                <span>Total Progress: <span id="total-progress">0</span>%</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="total-progress-fill"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="add-surah-section">
+            <h2>Add New Surah</h2>
+            <div class="form-row">
+                <input type="text" id="surah-name" placeholder="Surah Name (English)">
+                <input type="text" id="surah-arabic" placeholder="اسم السورة (Arabic)">
+                <input type="number" id="surah-verses" placeholder="Number of Verses" min="1">
+                <button id="add-surah">Add</button>
+            </div>
+        </div>
+        
+        <div class="surahs-list">
+            <h2>Your Surahs</h2>
+            <div id="surahs-container">
+                <!-- Surahs will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize with default surahs
+        let surahs = JSON.parse(localStorage.getItem('quranMemorization')) || [
+            { id: 1, name: "Al-Fatiha", arabicName: "الفاتحة", verses: 7, memorizedVerses: 0 },
+            { id: 2, name: "Al-Baqarah", arabicName: "البقرة", verses: 286, memorizedVerses: 0 },
+            { id: 3, name: "Ali Imran", arabicName: "آل عمران", verses: 200, memorizedVerses: 0 },
+            { id: 4, name: "An-Nisa", arabicName: "النساء", verses: 176, memorizedVerses: 0 },
+            { id: 5, name: "Al-Ma'idah", arabicName: "المائدة", verses: 120, memorizedVerses: 0 }
+        ];
+        
+        function saveData() {
+            localStorage.setItem('quranMemorization', JSON.stringify(surahs));
+            renderSurahs();
+            updateTotalProgress();
+        }
+        
+        function renderSurahs() {
+            const container = document.getElementById('surahs-container');
+            
+            if (surahs.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No surahs added yet. Add your first surah above!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            surahs.forEach(surah => {
+                const progressPercentage = surah.verses > 0 ? Math.round((surah.memorizedVerses / surah.verses) * 100) : 0;
+                
+                const surahCard = document.createElement('div');
+                surahCard.className = 'surah-card';
+                surahCard.innerHTML = `
+                    <div class="surah-header">
+                        <div class="surah-names">
+                            <h3>${surah.arabicName}</h3>
+                            <p>${surah.name} (Surah ${surah.id})</p>
+                        </div>
+                        <div class="surah-actions">
+                            <button onclick="resetProgress(${surah.id})">Reset</button>
+                            <button class="delete-btn" onclick="deleteSurah(${surah.id})">Delete</button>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="verse-input">
+                            <label>Verses Memorized:</label>
+                            <input type="number" value="${surah.memorizedVerses}" min="0" max="${surah.verses}" 
+                                   onchange="updateMemorizedVerses(${surah.id}, this.value)">
+                            <span>/ ${surah.verses}</span>
+                        </div>
+                        
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progressPercentage}%"></div>
+                        </div>
+                        
+                        <div class="progress-text">
+                            ${progressPercentage}% complete
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(surahCard);
+            });
+        }
+        
+        function updateTotalProgress() {
+            const totalVerses = surahs.reduce((sum, surah) => sum + surah.verses, 0);
+            const memorizedVerses = surahs.reduce((sum, surah) => sum + surah.memorizedVerses, 0);
+            const totalProgress = totalVerses > 0 ? Math.round((memorizedVerses / totalVerses) * 100) : 0;
+            
+            document.getElementById('total-progress').textContent = totalProgress;
+            document.getElementById('total-progress-fill').style.width = totalProgress + '%';
+        }
+        
+        function addSurah() {
+            const nameInput = document.getElementById('surah-name');
+            const arabicInput = document.getElementById('surah-arabic');
+            const versesInput = document.getElementById('surah-verses');
+            
+            const name = nameInput.value.trim();
+            const arabic = arabicInput.value.trim();
+            const verses = parseInt(versesInput.value) || 0;
+            
+            if (name && arabic && verses > 0) {
+                const newId = surahs.length > 0 ? Math.max(...surahs.map(s => s.id)) + 1 : 1;
+                surahs.push({
+                    id: newId,
+                    name: name,
+                    arabicName: arabic,
+                    verses: verses,
+                    memorizedVerses: 0
+                });
+                
+                saveData();
+                
+                // Clear inputs
+                nameInput.value = '';
+                arabicInput.value = '';
+                versesInput.value = '';
+            }
+        }
+        
+        function updateMemorizedVerses(id, value) {
+            const numValue = parseInt(value) || 0;
+            const surah = surahs.find(s => s.id === id);
+            if (surah) {
+                surah.memorizedVerses = Math.min(Math.max(0, numValue), surah.verses);
+                saveData();
+            }
+        }
+        
+        function deleteSurah(id) {
+            if (confirm('Are you sure you want to delete this surah?')) {
+                surahs = surahs.filter(s => s.id !== id);
+                saveData();
+            }
+        }
+        
+        function resetProgress(id) {
+            const surah = surahs.find(s => s.id === id);
+            if (surah) {
+                surah.memorizedVerses = 0;
+                saveData();
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('add-surah').addEventListener('click', addSurah);
+        document.getElementById('surah-name').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addSurah();
+        });
+        document.getElementById('surah-arabic').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addSurah();
+        });
+        document.getElementById('surah-verses').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addSurah();
+        });
+        
+        // Initialize
+        renderSurahs();
+        updateTotalProgress();
+    </script>
+</body>
+</html>
